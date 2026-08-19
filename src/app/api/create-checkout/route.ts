@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 /* -------------------------------------------------
    👉 REPLACE THESE WITH YOUR ACTUAL VALUES
    ------------------------------------------------- */
-const PRICE_ID = "price_1KkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"; // <-- your $49‑monthly price ID
+const PRICE_ID = "price_1U67bKC2FWObrmEWpL3ABzyc"; // <-- your $49‑monthly price ID
 
 /* Replace with the Vercel domain that will receive the redirects */
-const SUCCESS_URL = "https://YOUR_VERCEL_URL/payments/success?session_id={CHECKOUT_SESSION_ID}";
-const CANCEL_URL  = "https://YOUR_VERCEL_URL/payments/cancel";
+const SUCCESS_URL = "https://stripe-three-xi.vercel.app/payments/success?session_id={CHECKOUT_SESSION_ID}";
+const CANCEL_URL  = "https://stripe-three-xi.vercel.app/payments/cancel";
  /* ------------------------------------------------- */
 
 export const POST = async (request: Request) => {
