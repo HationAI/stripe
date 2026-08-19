@@ -1,8 +1,7 @@
-/* pages/index.tsx
-   – Simple home page with a button that opens a Stripe Checkout.
-   – The checkout's success_url and cancel_url should point at
-   /payments/success?session_id={CHECKOUT_SESSION_ID}
-   and /payments/cancel respectively.
+/*  Home page – opens a Stripe Checkout that charges:
+    • $249 one‑time setup fee (first payment)
+    • $49 every month thereafter
+  The Checkout UI is Stripe‑hosted, so no “link is incomplete” error.
 */
 
 "use client";
@@ -13,10 +12,20 @@ export default function Home() {
   const [open, setOpen] = useState(false);
 
   const handlePay = async () => {
-    // Call our API route to get a real Stripe Checkout URL
+    // 👉 Replace the URL below with your real Vercel domain
+    const successUrl = "https://YOUR_VERCEL_URL/payments/success?session_id={CHECKOUT_SESSION_ID}";
+    const cancelUrl  = "https://YOUR_VERCEL_URL/payments/cancel";
+
     const res = await fetch("/api/create-checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        // These values are used only for the UI preview; the real values come from the API.
+        // successUrl / cancelUrl are read from the API response, but we keep them here
+        // just in case the API call fails.
+        successUrl,
+        cancelUrl,
+      }),
     });
 
     if (!res.ok) {
@@ -25,50 +34,58 @@ export default function Home() {
       return;
     }
 
-    const { url } = await res.json();
+    const { url, setupFee, monthlyAmount } = await res.json();
 
-    // Open Stripe's hosted Checkout page
+    // Open Stripe’s hosted Checkout page
     window.open(url, "_blank");
     setOpen(true);
+
+    // OPTIONAL: show a quick inline notice (you could also display this on the success page)
+    console.log("👉 Setup fee: $", (setupFee / 100).toFixed(2));
+    console.log("👉 Monthly fee: $", (monthlyAmount / 100).toFixed(2));
   };
 
   return (
     <main
       style={{
-        fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
-        maxWidth: "600px",
+        fontFamily:
+          "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+        maxWidth: "680px",
         margin: "2rem auto",
-        padding: "2rem",
+        padding: "2rem 1.5rem",
         lineHeight: "1.5",
-        color: "#333",
+        color: "#222",
+        border: "1px solid #e2e8f0",
+        borderRadius: "8px",
+        background: "#f8f9fa",
       }}
     >
-      <h1>Welcome – Payment Demo</h1>
+      <h1 style={{ marginTop: 0 }}>Monthly Maintenance Subscription</h1>
 
       <p>
-        Click the button below to open a Stripe Checkout. After the payment
-        completes (or is cancelled) Stripe will redirect you back to the
-        /payments/success or /payments/cancel page.
+        One‑time setup fee: <strong>$249</strong> then <strong>$49</strong> every month.
+        Click the button below to pay with Stripe.
       </p>
 
       <button
         onClick={handlePay}
         style={{
           marginTop: "1rem",
-          padding: "0.75rem 1.5rem",
+          width: "100%",
+          padding: "0.85rem",
           fontSize: "1rem",
           cursor: "pointer",
-          backgroundColor: "#635bff",
+          backgroundColor: "#3b82f6",
           color: "#fff",
           border: "none",
-          borderRadius: "4px",
+          borderRadius: "6px",
         }}
       >
-        Pay now (single‑payment $15)
+        Start subscription ($249 setup + $49 /mo)
       </button>
 
       {open && (
-        <p style={{ marginTop: "1rem", color: "#666" }}>
+        <p style={{ marginTop: "1rem", color: "#64748b" }}>
           Checkout window opened. Return here after you finish.
         </p>
       )}
