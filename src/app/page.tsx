@@ -1,3 +1,10 @@
+/* pages/index.tsx
+   – Simple home page with a button that opens a Stripe Checkout.
+   – The checkout's success_url and cancel_url should point at
+   /payments/success?session_id={CHECKOUT_SESSION_ID}
+   and /payments/cancel respectively.
+*/
+
 "use client";
 
 import { useState } from "react";
@@ -5,19 +12,23 @@ import { useState } from "react";
 export default function Home() {
   const [open, setOpen] = useState(false);
 
-  const handlePay = () => {
-    // Replace with your actual Vercel URL and price ID
-    const successUrl = "https://YOUR_VERCEL_URL/payments/success?session_id={CHECKOUT_SESSION_ID}";
-    const cancelUrl = "https://YOUR_VERCEL_URL/payments/cancel";
+  const handlePay = async () => {
+    // Call our API route to get a real Stripe Checkout URL
+    const res = await fetch("/api/create-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
 
-    window.open(
-      `https://checkout.stripe.com/c/pay/cs_test_????.????.????.??????
-        ?success_url=${successUrl}&
-        cancel_url=${cancelUrl}&
-        line_items[0][price]=price_1KkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz&
-        line_items[0][quantity]=1`,
-      "_blank"
-    );
+    if (!res.ok) {
+      const err = await res.json();
+      alert("Could not create checkout: " + (err.error || res.statusText));
+      return;
+    }
+
+    const { url } = await res.json();
+
+    // Open Stripe's hosted Checkout page
+    window.open(url, "_blank");
     setOpen(true);
   };
 
@@ -53,7 +64,7 @@ export default function Home() {
           borderRadius: "4px",
         }}
       >
-        Pay now (monthly $15)
+        Pay now (single‑payment $15)
       </button>
 
       {open && (
