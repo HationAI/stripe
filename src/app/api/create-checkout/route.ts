@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 
-const PRICE_ID = "price_1U636TC2FWObrmEWpeuLNttb";
+const PRICE_ID = "price_1U639CC2FWObrmEW6VJ7nHoe";
 
 const SUCCESS_URL = "https://stripe-three-xi.vercel.app/payments/success?session_id={CHECKOUT_SESSION_ID}";
 const CANCEL_URL  = "https://stripe-three-xi.vercel.app/payments/cancel";
@@ -15,7 +15,6 @@ export const POST = async (request: Request) => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      payment_method_types: ["card"],
       line_items: [
         {
           price: PRICE_ID,
